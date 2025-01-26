@@ -35,6 +35,7 @@ def configure_ngrok():
             else:
                 print(f"Failed to configure ngrok: {str(e)}")
                 break
+                
 
 def update_soul_txt(public_url):
     with open("soul3.txt", "w") as file:
