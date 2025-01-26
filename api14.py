@@ -1,7 +1,7 @@
-
 import os
 import subprocess
 import threading
+import time
 from flask import Flask, request, jsonify, send_from_directory
 from pyngrok import ngrok
 import paramiko
@@ -31,11 +31,10 @@ def configure_ngrok():
         except Exception as e:
             if "ERR_NGROK_108" in str(e):
                 print("ngrok token is already in use or limited. Retrying in 30 seconds...")
-                time.sleep(30)
+                time.sleep(30)  # Fixed the NameError
             else:
                 print(f"Failed to configure ngrok: {str(e)}")
                 break
-                
 
 def update_soul_txt(public_url):
     with open("soul3.txt", "w") as file:
