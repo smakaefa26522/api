@@ -19,7 +19,6 @@ def install_packages():
 
 def configure_ngrok():
     ngrok_token = "2rYyIQ78wWamwxXokgTn4hAJnu3_7SKcoHz4tdC8K7Z3jUZb4"
-    try:
     while True:
         try:
             ngrok.set_auth_token(ngrok_token)
