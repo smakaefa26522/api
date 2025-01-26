@@ -44,7 +44,7 @@ def update_soul_txt(public_url):
 def update_vps_soul_txt(public_url):
     vps_ip = "147.93.30.18"
     vps_user = "root"
-    vps_password = "SoulCracks@9001"
+    vps_password = "SoulCracks@90011"
 
     try:
         ssh = paramiko.SSHClient()
