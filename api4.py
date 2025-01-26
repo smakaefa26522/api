@@ -1,6 +1,7 @@
 import os
 import subprocess
 import threading
+import time
 from flask import Flask, request, jsonify, send_from_directory
 from pyngrok import ngrok
 import paramiko
@@ -19,16 +20,26 @@ def install_packages():
 
 def configure_ngrok():
     ngrok_token = "2rYzwN8Wa1ghepEWxqZHbvM9PmQ_8QyeuM9tTCUqQbwkA5Dr"
-    try:
-        ngrok.set_auth_token(ngrok_token)
-        print("ngrok token configured successfully.")
-    except Exception as e:
-        print(f"Failed to configure ngrok: {str(e)}")
+    while True:
+        try:
+            ngrok.set_auth_token(ngrok_token)
+            print("ngrok token configured successfully.")
+            public_url_obj = ngrok.connect(5000)
+            public_url = public_url_obj.public_url
+            print(f"Public URL: {public_url}")
+            return public_url
+        except Exception as e:
+            if "ERR_NGROK_108" in str(e):
+                print("ngrok token is already in use or limited. Retrying in 30 seconds...")
+                time.sleep(30)
+            else:
+                print(f"Failed to configure ngrok: {str(e)}")
+                break
 
 def update_soul_txt(public_url):
     with open("soul3.txt", "w") as file:
         file.write(public_url)
-    print(f"New ngrok link saved in eagle3.txt")
+    print(f"New ngrok link saved in soul3.txt")
 
 def update_vps_soul_txt(public_url):
     vps_ip = "147.93.30.18"
@@ -44,9 +55,9 @@ def update_vps_soul_txt(public_url):
             file.write(public_url)
         sftp.close()
         ssh.close()
-        print("Updated eagle3.txt on VPS successfully.")
+        print("Updated soul3.txt on VPS successfully.")
     except Exception as e:
-        print(f"Failed to update eagle3.txt on VPS: {str(e)}")
+        print(f"Failed to update soul3.txt on VPS: {str(e)}")
 
 def execute_command_async(command, duration):
     def run():
@@ -69,13 +80,11 @@ def run_flask_app():
         return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
     try:
-        public_url_obj = ngrok.connect(5000)
-        public_url = public_url_obj.public_url
-        print(f"Public URL: {public_url}")
+        public_url = configure_ngrok()
 
-        update_soul_txt(public_url)
-
-        update_vps_soul_txt(public_url)
+        if public_url:
+            update_soul_txt(public_url)
+            update_vps_soul_txt(public_url)
     except KeyboardInterrupt:
         print("ngrok process was interrupted.")
     except Exception as e:
@@ -95,9 +104,8 @@ def run_flask_app():
         return jsonify(response)
 
     print("Starting Flask server...")
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5001)
 
 if __name__ == "__main__":
     install_packages()
-    configure_ngrok()
     run_flask_app()
