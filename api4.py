@@ -99,7 +99,7 @@ def run_flask_app():
         if not ip or not port or not time:
             return jsonify({'error': 'Missing parameters'}), 400
 
-        command = f"./soul {ip} {port} {time} 900"
+        command = f"./soul {ip} {port} {time}"
         response = execute_command_async(command, time)
         return jsonify(response)
 
